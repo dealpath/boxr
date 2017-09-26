@@ -10,12 +10,21 @@ module Boxr
       collaborations['entries']
     end
 
-    def add_collaboration(folder, accessible_by, role, fields: [], notify: nil)
-      folder_id = ensure_id(folder)
+    def file_collaborations(file, fields: [])
+      file_id = ensure_id(file)
+      query = build_fields_query(fields, COLLABORATION_FIELDS_QUERY)
+      uri = "#{FILES_URI}/#{file_id}/collaborations"
+
+      collaborations, response = get(uri, query: query)
+      collaborations['entries']
+    end
+
+    def add_collaboration(folder_or_file, accessible_by, role, fields: [], notify: nil)
+      folder_or_file_id = ensure_id(folder_or_file)
       query = build_fields_query(fields, COLLABORATION_FIELDS_QUERY)
       query[:notify] = :notify unless notify.nil?
 
-      attributes = {item: {id: folder_id, type: :folder}}
+      attributes = {item: {id: folder_or_file_id, type: folder_or_file.type}}
       attributes[:accessible_by] = accessible_by
       attributes[:role] = validate_role(role)
 
