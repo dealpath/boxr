@@ -39,6 +39,17 @@ module Boxr
     get_token(grant_type: JWT_GRANT_TYPE, assertion: assertion, client_id: client_id, client_secret: client_secret)
   end
 
+  def self.get_downscope_token(subject_token, scope, resource=nil)
+    uri = "https://api.box.com/oauth2/token"
+    body = "subject_token=#{subject_token}"
+    body = body + "&subject_token_type=urn:ietf:params:oauth:token-type:access_token"
+    body = body + "&scope=#{scope}"
+    body = body + "&resource=#{resource}" unless resource.nil?
+    body = body + "&grant_type=urn:ietf:params:oauth:grant-type:token-exchange"
+
+    auth_post(uri, body)
+  end
+
   def self.refresh_tokens(refresh_token, client_id: ENV['BOX_CLIENT_ID'], client_secret: ENV['BOX_CLIENT_SECRET'])
     uri = "https://api.box.com/oauth2/token"
     body = "grant_type=refresh_token&refresh_token=#{refresh_token}&client_id=#{client_id}&client_secret=#{client_secret}"
